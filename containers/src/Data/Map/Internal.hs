@@ -398,6 +398,7 @@ import qualified Data.Set.Internal as Set
 import Data.Set.Internal (Set)
 import Utils.Containers.Internal.PtrEquality (ptrEq)
 import Utils.Containers.Internal.StrictPair
+import Utils.Containers.Internal.StrictTriple
 import Utils.Containers.Internal.StrictMaybe
 import Utils.Containers.Internal.BitQueue
 #ifdef DEFINE_ALTERF_FALLBACK
@@ -3982,8 +3983,6 @@ splitMember k0 m = case go k0 m of
 #if __GLASGOW_HASKELL__
 {-# INLINABLE splitMember #-}
 #endif
-
-data StrictTriple a b c = StrictTriple !a !b !c
 
 {--------------------------------------------------------------------
   Utility functions that maintain the balance properties of the tree.
