@@ -7,3 +7,6 @@ benchmarks: True
 
 -- package containers-tests
 --   ghc-options: -Werror
+
+allow-newer:
+  , ChasingBottoms:base

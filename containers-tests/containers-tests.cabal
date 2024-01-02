@@ -37,7 +37,7 @@ common deps
   build-depends:
       array    >=0.4.0.0
     , base     >=4.10    && <5
-    , deepseq  >=1.2     && <1.5
+    , deepseq  >=1.2     && <1.6
     , template-haskell
 
 common test-deps
@@ -54,7 +54,7 @@ common benchmark-deps
   import: deps
   build-depends:
       containers-tests
-    , deepseq           >=1.1.0.0 && <1.5
+    , deepseq           >=1.1.0.0 && <1.6
     , tasty-bench       >=0.3.1   && <0.4
 
 -- Copy of containers library,

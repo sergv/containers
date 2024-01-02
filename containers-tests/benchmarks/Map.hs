@@ -5,11 +5,12 @@ module Main where
 import Control.Applicative (Const(Const, getConst), pure)
 import Control.DeepSeq (rnf)
 import Control.Exception (evaluate)
-import Test.Tasty.Bench (bench, defaultMain, whnf, nf, bcompare)
+import Test.Tasty.Bench (bench, defaultMain, whnf, nf, bcompare, bgroup)
 import Data.Functor.Identity (Identity(..))
 import Data.List (foldl')
 import qualified Data.Map as M
 import qualified Data.Map.Strict as MS
+import qualified Data.Set as S
 import Data.Map (alterF)
 import Data.Maybe (fromMaybe)
 import Data.Functor ((<$))
@@ -22,9 +23,10 @@ main = do
         m_even = M.fromAscList elems_even :: M.Map Int Int
         m_odd = M.fromAscList elems_odd :: M.Map Int Int
         m_odd_keys = M.keysSet m_odd
+        m_even_keys = M.keysSet m_even
     evaluate $ rnf [m, m_even, m_odd]
     evaluate $ rnf elems_rev
-    evaluate $ rnf m_odd_keys
+    evaluate $ rnf [m_odd_keys, m_even_keys]
     defaultMain
         [ bench "lookup absent" $ whnf (lookup evens) m_odd
         , bench "lookup present" $ whnf (lookup evens) m_even
@@ -98,9 +100,27 @@ main = do
         , bench "fromDistinctDescList" $ whnf M.fromDistinctDescList elems_rev
         , bench "fromDistinctDescList:fusion" $ whnf (\n -> M.fromDistinctDescList [(i,i) | i <- [n,n-1..1]]) bound
         , bench "minView" $ whnf (\m' -> case M.minViewWithKey m' of {Nothing -> 0; Just ((k,v),m'') -> k+v+M.size m''}) (M.fromAscList $ zip [1..10::Int] [100..110::Int])
-        , bench "restrictKeys" $ whnf (M.restrictKeys m) m_odd_keys
-        , bench "withoutKeys" $ whnf (M.withoutKeys m) m_odd_keys
-        , bench "partitionKeys" $ whnf (M.partitionKeys m) m_odd_keys
+
+        , bgroup "even"
+          [ bench "restrictKeys+withoutKeys"
+          $ nf (\ks -> (M.restrictKeys m ks, M.withoutKeys m ks)) m_even_keys
+          , bcompare "/even.restrictKeys+withoutKeys/"
+          $ bench "partitionKeys"
+          $ nf (M.partitionKeys m) m_even_keys
+          , bcompare "/even.restrictKeys+withoutKeys/"
+          $ bench "partitionWithKey"
+          $ nf (\ks -> M.partitionWithKey (\k _ -> S.member k ks) m) m_even_keys
+          ]
+        , bgroup "odd"
+          [ bench "restrictKeys+withoutKeys"
+          $ nf (\ks -> (M.restrictKeys m ks, M.withoutKeys m ks)) m_odd_keys
+          , bcompare "/odd.restrictKeys+withoutKeys/"
+          $ bench "partitionKeys"
+          $ nf (M.partitionKeys m) m_odd_keys
+          , bcompare "/odd.restrictKeys+withoutKeys/"
+          $ bench "partitionWithKey"
+          $ nf (\ks -> M.partitionWithKey (\k _ -> S.member k ks) m) m_even_keys
+          ]
         ]
   where
     bound = 2^12
