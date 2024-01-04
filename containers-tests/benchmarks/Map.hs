@@ -103,23 +103,23 @@ main = do
 
         , bgroup "even"
           [ bench "restrictKeys+withoutKeys"
-          $ nf (\ks -> (M.restrictKeys m ks, M.withoutKeys m ks)) m_even_keys
+          $ whnf (\ks -> M.restrictKeys m ks :*: M.withoutKeys m ks) m_even_keys
           , bcompare "/even.restrictKeys+withoutKeys/"
           $ bench "partitionKeys"
-          $ nf (M.partitionKeys m) m_even_keys
+          $ whnf (M.partitionKeys m) m_even_keys
           , bcompare "/even.restrictKeys+withoutKeys/"
           $ bench "partitionWithKey"
-          $ nf (\ks -> M.partitionWithKey (\k _ -> S.member k ks) m) m_even_keys
+          $ whnf (\ks -> M.partitionWithKey (\k _ -> S.member k ks) m) m_even_keys
           ]
         , bgroup "odd"
           [ bench "restrictKeys+withoutKeys"
-          $ nf (\ks -> (M.restrictKeys m ks, M.withoutKeys m ks)) m_odd_keys
+          $ whnf (\ks -> M.restrictKeys m ks :*: M.withoutKeys m ks) m_odd_keys
           , bcompare "/odd.restrictKeys+withoutKeys/"
           $ bench "partitionKeys"
-          $ nf (M.partitionKeys m) m_odd_keys
+          $ whnf (M.partitionKeys m) m_odd_keys
           , bcompare "/odd.restrictKeys+withoutKeys/"
           $ bench "partitionWithKey"
-          $ nf (\ks -> M.partitionWithKey (\k _ -> S.member k ks) m) m_even_keys
+          $ whnf (\ks -> M.partitionWithKey (\k _ -> S.member k ks) m) m_even_keys
           ]
         ]
   where
