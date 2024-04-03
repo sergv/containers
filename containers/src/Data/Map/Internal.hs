@@ -297,6 +297,7 @@ module Data.Map.Internal (
     , restrictKeys
     , withoutKeys
     , partitionKeys
+    , partitionKeysSplitMap
     , partition
     , partitionWithKey
 
@@ -1989,6 +1990,46 @@ partitionKeysWorker m@(Bin _ k x lm rm) s@Set.Bin{} =
 #if __GLASGOW_HASKELL__
 {-# INLINABLE partitionKeysWorker #-}
 #endif
+
+partitionKeysSplitMap :: Ord k => Map k a -> Set k -> (Map k a, Map k a)
+partitionKeysSplitMap xs ys =
+  case partitionKeysSplitMapWorker xs ys of
+    xs' :*: ys' -> (xs', ys')
+#if __GLASGOW_HASKELL__
+{-# INLINABLE partitionKeysSplitMap #-}
+#endif
+
+partitionKeysSplitMapWorker :: Ord k => Map k a -> Set k -> StrictPair (Map k a) (Map k a)
+partitionKeysSplitMapWorker Tip _                   = Tip :*: Tip
+partitionKeysSplitMapWorker m   Set.Tip             = Tip :*: m
+partitionKeysSplitMapWorker m   (Set.Bin _ k ls rs) =
+  case b of
+    Just x  -> with :*: without
+      where
+        with    =
+          if lmWith `ptrEq` lm && rmWith `ptrEq` rm
+          then m
+          else link k x lmWith rmWith
+        without =
+          link2 lmWithout rmWithout
+    Nothing -> with :*: without
+      where
+        with    =
+          link2 lmWith rmWith
+        without =
+          if lmWithout `ptrEq` lm && rmWithout `ptrEq` rm
+          then m
+          else link2 lmWithout rmWithout
+  where
+    !(lmWith :*: lmWithout) = partitionKeysSplitMapWorker lm ls
+    !(rmWith :*: rmWithout) = partitionKeysSplitMapWorker rm rs
+
+    !(lm, b, rm) = splitLookup k m
+#if __GLASGOW_HASKELL__
+{-# INLINABLE partitionKeysSplitMapWorker #-}
+#endif
+
+
 
 -- | \(O(n+m)\). Difference with a combining function.
 -- When two equal keys are

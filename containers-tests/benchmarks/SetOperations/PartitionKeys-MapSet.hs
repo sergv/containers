@@ -11,4 +11,5 @@ main =
     S.fromList
     True
     [ ("partitionKeys", M.partitionKeys)
+    , ("partitionKeysSplitMap", M.partitionKeysSplitMap)
     ]

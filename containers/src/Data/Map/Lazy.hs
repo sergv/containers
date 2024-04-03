@@ -223,6 +223,7 @@ module Data.Map.Lazy (
     , restrictKeys
     , withoutKeys
     , partitionKeys
+    , partitionKeysSplitMap
     , partition
     , partitionWithKey
     , takeWhileAntitone

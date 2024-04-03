@@ -254,6 +254,7 @@ module Data.Map.Strict.Internal
     , restrictKeys
     , withoutKeys
     , partitionKeys
+    , partitionKeysSplitMap
     , partition
     , partitionWithKey
     , takeWhileAntitone
@@ -418,7 +419,8 @@ import Data.Map.Internal
   , union
   , unions
   , withoutKeys
-  , partitionKeys )
+  , partitionKeys
+  , partitionKeysSplitMap )
 
 #if defined(__GLASGOW_HASKELL__)
 import Data.Map.Internal.DeprecatedShowTree (showTree, showTreeWith)

@@ -174,6 +174,7 @@ main = defaultMain $ testGroup "map-properties"
          , testProperty "intersection"         prop_intersection
          , testProperty "restrictKeys"         prop_restrictKeys
          , testProperty "partitionKeys"        prop_partitionKeys
+         , testProperty "partitionKeysSplitMap" prop_partitionKeysSplitMap
          , testProperty "intersection model"   prop_intersectionModel
          , testProperty "intersectionWith"     prop_intersectionWith
          , testProperty "intersectionWithModel" prop_intersectionWithModel
@@ -1144,6 +1145,15 @@ prop_partitionKeys m s0 = valid with .&&. valid without .&&. (m `partitionKeys` 
   where
     s = keysSet s0
     (with, without) = partitionKeys m s
+
+prop_partitionKeysSplitMap :: IMap -> IMap -> Property
+prop_partitionKeysSplitMap m s0 =
+  valid with .&&.
+  valid without .&&.
+  (m `partitionKeysSplitMap` s === (m `restrictKeys` s, m `withoutKeys` s))
+  where
+    s = keysSet s0
+    (with, without) = Data.Map.partitionKeysSplitMap m s
 
 prop_intersection :: IMap -> IMap -> Bool
 prop_intersection t1 t2 = valid (intersection t1 t2)
