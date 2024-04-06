@@ -3,7 +3,7 @@
 
 module SetOperations (benchmark, benchmark') where
 
-import Test.Tasty.Bench (bench, defaultMain, whnf)
+import Test.Tasty.Bench (Benchmark, bench, defaultMain, whnf)
 import Data.List (partition, sortBy)
 import Data.Ord (comparing)
 import Data.Tuple as Tuple
@@ -15,7 +15,7 @@ import Data.Tuple as Tuple
 -- * A list of operations.
 benchmark :: forall container. (Show container, Eq container) => ([Int] -> container) -> Bool -> [(String, container -> container -> container)] -> IO ()
 benchmark fromList swap methods =
-  benchmark' fromList fromList swap methods
+  benchmark' fromList fromList swap (map (\(a, b) -> (a, b, const id)) methods)
 
 benchmark'
   :: forall container1 container2 container3.
@@ -23,15 +23,16 @@ benchmark'
   => ([Int] -> container1)
   -> ([Int] -> container2)
   -> Bool
-  -> [(String, container1 -> container2 -> container3)]
+  -> [(String, container1 -> container2 -> container3, String -> Benchmark -> Benchmark)]
   -> IO ()
 benchmark' fromList1 fromList2 swap methods = do
 
-  defaultMain $ [ bench (method_str++"-"++input_str ++ "_" ++ data_sizes) $
-                        whnf (method input1) input2
+  defaultMain $ [ f subname $ bench (method_str ++ subname) $
+                  whnf (method input1) input2
 
-                | (method_str, method) <- methods
+                | (method_str, method, f) <- methods
                 , (input_str, data_sizes, (input1, input2)) <- sortBenchs all_inputs
+                , let subname = "-" ++ input_str ++ "_" ++ data_sizes
                 ]
 
   where

@@ -234,6 +234,7 @@ benchmark partition-keys-mapset
   hs-source-dirs: benchmarks/SetOperations
   main-is:        PartitionKeys-MapSet.hs
   other-modules:  SetOperations
+  build-depends:  tasty, tasty-bench
   ghc-options:    -O2
 
 benchmark lookupge-intmap
