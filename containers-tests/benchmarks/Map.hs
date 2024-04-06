@@ -98,12 +98,9 @@ main = do
         , bench "fromDistinctDescList" $ whnf M.fromDistinctDescList elems_rev
         , bench "fromDistinctDescList:fusion" $ whnf (\n -> M.fromDistinctDescList [(i,i) | i <- [n,n-1..1]]) bound
         , bench "minView" $ whnf (\m' -> case M.minViewWithKey m' of {Nothing -> 0; Just ((k,v),m'') -> k+v+M.size m''}) (M.fromAscList $ zip [1..10::Int] [100..110::Int])
-
-        , bench "restrictKeys+withoutKeys"
-        $ whnf (\ks -> M.restrictKeys m ks :*: M.withoutKeys m ks) m_odd_keys
-        , bcompare "/restrictKeys+withoutKeys/"
-        $ bench "partitionKeys"
-        $ whnf (M.partitionKeys m) m_odd_keys
+        , bench "restrictKeys" $ whnf (M.restrictKeys m) m_odd_keys
+        , bench "withoutKeys" $ whnf (M.withoutKeys m) m_odd_keys
+        , bench "partitionKeys" $ whnf (M.partitionKeys m) m_odd_keys
         ]
   where
     bound = 2^12
